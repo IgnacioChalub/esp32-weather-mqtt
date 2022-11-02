@@ -42,9 +42,9 @@ static char client_name[20];
 
 
 static void activate_ultimate_watering_system() {
-    digitalWrite(13, HIGH);
+    digitalWrite(2, LOW);
     delay(3000);
-    digitalWrite(13, LOW);
+    digitalWrite(2, HIGH);
 }
 
 
@@ -78,7 +78,7 @@ static void do_connect(void) {
             delay(5000);
         }
     }
-    do_subscribe("environment-data");
+    do_subscribe("environment-data-micro");
     Serial.printf( "Connected to %s\n\r", mqttServer );
 
 }
@@ -153,11 +153,15 @@ setup(void)
 void
 loop()
 {
+    
+
     float h, t, f;
 
-    delay(2000);                    // It is a low speed sensor !!
-    do_publish("environment-data", "hi");
-    //activate_ultimate_watering_system();
+    delay(5000);                    // It is a low speed sensor !!
+    
+    //do_publish("environment-data", "some data"); 
+
+    // digitalWrite(13,HIGH);
 
     h = dht.readHumidity();
     t = dht.readTemperature();     // in Celsius
@@ -166,8 +170,10 @@ loop()
     if (isnan(h) || isnan(t) || isnan(f))   //    Failed measurement ?
         Serial.printf("Measurement failure");
     else
-        //do_publish("environment-data", "hi"); 
+        do_publish("environment-data-server", "some data"); 
         Serial.printf( "DHT%d -> Humedad: %5.1f %%, Temperatura: %5.1f C | %5.1f F\n\r", DHTTYPE, h, t, f );
+
+    mqtt_comms();
 }
 
 
