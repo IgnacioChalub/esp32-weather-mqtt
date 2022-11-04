@@ -29,8 +29,8 @@ PubSubClient client(espClient);
 DHT dht(DHTPIN, DHTTYPE);   // New DHT type object
 
 const int LED_PORT = 13;
-const char* ssid = "UA-Alumnos";
-const char* password = "41umn05WLC";
+const char* ssid = "";
+const char* password = "";
 const char* MQTT_NAME = "BULAHC";
 const char* mqttUser = "/";
 const char* mqttPassword = "/";
@@ -39,6 +39,9 @@ const int mqttPort = 1883;
 
 
 static char client_name[20];
+
+//string to send data to server
+char buffer[100];
 
 
 static void activate_ultimate_watering_system() {
@@ -147,6 +150,9 @@ setup(void)
     Serial.printf("Local ESP32 IP: ");
     Serial.println(WiFi.localIP());
 
+
+
+
     init_mqtt();
 }
 
@@ -163,6 +169,8 @@ loop()
 
     // digitalWrite(13,HIGH);
 
+    
+
     h = dht.readHumidity();
     t = dht.readTemperature();     // in Celsius
     f = dht.readTemperature(true); // in Fahrenheit
@@ -170,7 +178,8 @@ loop()
     if (isnan(h) || isnan(t) || isnan(f))   //    Failed measurement ?
         Serial.printf("Measurement failure");
     else
-        do_publish("environment-data-server", "some data"); 
+        sprintf(buffer, "{\"humedad\": %5.1f, \"temperaturaCelsius\": %5.1f, \"temperaturaFarenheit\": %5.1f}", h, t, f);
+        do_publish("environment-data-server", buffer); 
         Serial.printf( "DHT%d -> Humedad: %5.1f %%, Temperatura: %5.1f C | %5.1f F\n\r", DHTTYPE, h, t, f );
 
     mqtt_comms();
